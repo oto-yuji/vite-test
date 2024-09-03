@@ -159,6 +159,8 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
       console.error('Error creating movie:', error);
     }
 
+    // フォームを閉じる
+    setShowCreateForm(false);
   };
 
   const onDelete = async (index: number) => {
