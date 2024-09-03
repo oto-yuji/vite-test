@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { Movie } from '../types';
 import { getRandomMovie } from '../utils';
 import { useSpring, animated, config } from '@react-spring/web';
 import { getMovieList } from '../api';
+
+const colorChange = keyframes`
+  0% { color: #D32F2F; }   // より明るい赤
+  20% { color: #F57C00; }  // より明るいオレンジ
+  40% { color: #388E3C; }  // より明るい緑
+  60% { color: #1976D2; }  // より明るい青
+  80% { color: #512DA8; }  // より明るい紫
+  100% { color: #C2185B; } // より明るいピンク
+`;
 
 const RecommendationContainer = styled.div`
   text-align: left;
@@ -12,11 +21,16 @@ const RecommendationContainer = styled.div`
 `;
 
 const RecommendationTitle = styled.h2<{ isShuffling: boolean }>`
-  color: #4b3832; /* ダークブラウン */
   font-size: 1.8em;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
+  color: ${props => props.isShuffling ? '#D32F2F' : '#4b3832'}; // デフォルトの色を設定
+`;
+
+const AnimatedSpan = styled.span`
+  animation: ${colorChange} 4s linear infinite;
+  font-weight: bold;
 `;
 
 const Emoji = styled.span`
@@ -67,9 +81,9 @@ const Button = styled.a`
 `;
 
 const ReloadButton = styled.button`
-  background-color: #ff4136; // 赤色に変更
+  background-color: #ff4136;
   color: white;
-  padding: 8px 16px;
+  padding: ${props => props.disabled ? '8px' : '8px 16px'};
   border: none;
   border-radius: 5px;
   font-size: 0.9em;
@@ -101,11 +115,16 @@ const ReloadButton = styled.button`
     transition: all 0.6s;
   }
 
-  &:hover {
-    background-color: #e60000; // ホバー時の色をより濃い赤に
+  &:hover:not(:disabled) {
+    background-color: #e60000;
     &:before {
       left: 100%;
     }
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 `;
 
@@ -173,7 +192,7 @@ const RandomRecommendation: React.FC<RandomRecommendationProps> = ({ /* movies *
     <RecommendationContainer>
       <RecommendationTitle isShuffling={isShuffling}>
         {isShuffling ? (
-          <>シャッフル中<Emoji>🎲</Emoji></>
+          <AnimatedSpan>考え中…</AnimatedSpan>
         ) : (
           <>おすすめの映画<Emoji>{randomMovie?.emoji}</Emoji></>
         )}
@@ -193,7 +212,7 @@ const RandomRecommendation: React.FC<RandomRecommendationProps> = ({ /* movies *
         <ShuffleIcon viewBox="0 0 24 24" fill="currentColor">
           <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
         </ShuffleIcon>
-        {isShuffling ? 'シャッフル中...' : 'シャッフル'}
+        {!isShuffling && '選び直してもらう'}
       </ReloadButton>
     </RecommendationContainer>
   );
