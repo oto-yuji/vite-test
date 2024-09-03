@@ -118,6 +118,17 @@ const CreateButton = styled(Button)`
   }
 `;
 
+const ErrorMessage = styled.p`
+  color: #D32F2F;
+  font-size: 0.9em;
+  margin-top: 2px;
+  margin-bottom: 0; // 下マージンを削除
+`;
+
+const InputContainer = styled.div`
+  margin-bottom: 10px;
+`;
+
 const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
   const [moviesList, setMoviesList] = useState<Movie[]>(movies);
   const [inputMovie, setInputMovie] = useState({
@@ -128,8 +139,13 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
   });
   const [editInfo, setEditInfo] = useState<Movie[]>(movies);
   const [showCreateForm, setShowCreateForm] = useState(false);
-
   const [updateOn, setUpdateON] = useState<boolean[]>([false]);
+  const [formErrors, setFormErrors] = useState({
+    title: '',
+    description: '',
+    url: '',
+    emoji: '',
+  });
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -144,23 +160,63 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
     fetchMovies();
   }, []);
 
-  const onCreate = async () => {
-    const newMovie = { ...inputMovie };
+  const validateForm = () => {
+    let errors = {
+      title: '',
+      description: '',
+      url: '',
+      emoji: '',
+    };
+    let isValid = true;
 
-    const newMovieList = [...moviesList, newMovie];
-
-    setMoviesList(newMovieList as Movie[]);
-
-    setInputMovie({ title: '', description: '', url: '', emoji: '' });
-    
-    try {
-      await createMovie(newMovie as Movie);
-    } catch (error) {
-      console.error('Error creating movie:', error);
+    if (!inputMovie.title.trim()) {
+      errors.title = 'タイトルを入力してください';
+      isValid = false;
     }
 
-    // フォームを閉じる
-    setShowCreateForm(false);
+    if (!inputMovie.description.trim()) {
+      errors.description = '説明を入力してください';
+      isValid = false;
+    }
+
+    if (!inputMovie.url.trim()) {
+      errors.url = 'URLを入力してください';
+      isValid = false;
+    } else {
+      try {
+        new URL(inputMovie.url);
+      } catch (_) {
+        errors.url = '有効なURLを入力してください';
+        isValid = false;
+      }
+    }
+
+    if (!inputMovie.emoji.trim()) {
+      errors.emoji = '絵文字を入力してください';
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+  const onCreate = async () => {
+    if (validateForm()) {
+      const newMovie = { ...inputMovie };
+
+      const newMovieList = [...moviesList, newMovie];
+
+      setMoviesList(newMovieList as Movie[]);
+
+      setInputMovie({ title: '', description: '', url: '', emoji: '' });
+      
+      try {
+        await createMovie(newMovie as Movie);
+        setShowCreateForm(false);
+      } catch (error) {
+        console.error('Error creating movie:', error);
+      }
+    }
   };
 
   const onDelete = async (index: number) => {
@@ -204,6 +260,10 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
 
   const toggleCreateForm = () => {
     setShowCreateForm(!showCreateForm);
+    if (showCreateForm) {
+      setInputMovie({ title: '', description: '', url: '', emoji: '' });
+      setFormErrors({ title: '', description: '', url: '', emoji: '' });
+    }
   };
 
   return (
@@ -214,7 +274,7 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
       {showCreateForm && (
         <FormContainer>
           <CloseButton onClick={toggleCreateForm}>✕</CloseButton>
-          <div>
+          <InputContainer>
             <InputField
               type="text"
               placeholder="タイトル"
@@ -223,8 +283,9 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
                 setInputMovie({ ...inputMovie, title: e.target.value })
               }
             />
-          </div>
-          <div>
+            {formErrors.title && <ErrorMessage>{formErrors.title}</ErrorMessage>}
+          </InputContainer>
+          <InputContainer>
             <InputField
               type="text"
               placeholder="説明"
@@ -233,8 +294,9 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
                 setInputMovie({ ...inputMovie, description: e.target.value })
               }
             />
-          </div>
-          <div>
+            {formErrors.description && <ErrorMessage>{formErrors.description}</ErrorMessage>}
+          </InputContainer>
+          <InputContainer>
             <InputField
               type="text"
               placeholder="URL"
@@ -243,8 +305,9 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
                 setInputMovie({ ...inputMovie, url: e.target.value })
               }
             />
-          </div>
-          <div>
+            {formErrors.url && <ErrorMessage>{formErrors.url}</ErrorMessage>}
+          </InputContainer>
+          <InputContainer>
             <InputField
               type="text"
               placeholder="絵文字"
@@ -253,7 +316,8 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
                 setInputMovie({ ...inputMovie, emoji: e.target.value })
               }
             />
-          </div>
+            {formErrors.emoji && <ErrorMessage>{formErrors.emoji}</ErrorMessage>}
+          </InputContainer>
           <CreateButton onClick={onCreate}>作品を登録</CreateButton>
         </FormContainer>
       )}
