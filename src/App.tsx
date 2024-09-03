@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import MovieList from './components/MovieList';
 import RandomRecommendation from './components/RandomRecommendation';
-import { Movie } from './types';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -61,51 +60,6 @@ const Divider = styled.hr`
   margin: 20px 0;
 `;
 
-const movies: Movie[] = [
-  {
-    id: 1, // 追加
-    title: 'アラジン',
-    description: 'A story about a young man and a genie.',
-    url: 'https://example.com/aladdin',
-    emoji: '🧞‍♂',
-  },
-  {
-    id: 2, // 追加
-    title: 'ライオンキング',
-    description: 'A story about a lion cub becoming a king.',
-    url: 'https://example.com/lionking',
-    emoji: '🦁',
-  },
-  {
-    id: 3, // 追加
-    title: '美女と野獣',
-    description: 'A story about a young woman and a cursed prince.',
-    url: 'https://example.com/beautyandbeast',
-    emoji: '🌹',
-  },
-  {
-    id: 4, // 追加
-    title: 'くまのプーさん',
-    description: 'A story about a bear and his friends.',
-    url: 'https://example.com/pooh',
-    emoji: '🍯',
-  },
-  {
-    id: 5, // 追加
-    title: 'リトル・マーメイド',
-    description: 'A story about a mermaid who wants to be human.',
-    url: 'https://example.com/littlemermaid',
-    emoji: '🧜‍♀',
-  },
-  {
-    id: 6, // 追加
-    title: 'アナと雪の女王',
-    description: 'A story about two sisters and their icy powers.',
-    url: 'https://example.com/frozen',
-    emoji: '⛄',
-  },
-];
-
 const App: React.FC = () => {
   return (
     <Router>
@@ -120,12 +74,8 @@ const App: React.FC = () => {
         </Nav>
         <Divider />
         <Routes>
-          {' '}
-          <Route
-            path="/"
-            element={<RandomRecommendation movies={movies} />}
-          />{' '}
-          <Route path="/movies" element={<MovieList movies={movies} />} />{' '}
+          <Route path="/" element={<RandomRecommendation />} />
+          <Route path="/movies" element={<MovieList />} />
         </Routes>
       </Container>
     </Router>

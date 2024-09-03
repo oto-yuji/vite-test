@@ -129,17 +129,17 @@ const InputContainer = styled.div`
   margin-bottom: 10px;
 `;
 
-const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
-  const [moviesList, setMoviesList] = useState<Movie[]>(movies);
+const MovieList: React.FC = () => {
+  const [moviesList, setMoviesList] = useState<Movie[]>([]);
   const [inputMovie, setInputMovie] = useState({
     title: '',
     description: '',
     url: '',
     emoji: '',
   });
-  const [editInfo, setEditInfo] = useState<Movie[]>(movies);
+  const [editInfo, setEditInfo] = useState<Movie[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [updateOn, setUpdateON] = useState<boolean[]>([false]);
+  const [updateOn, setUpdateON] = useState<boolean[]>([]);
   const [formErrors, setFormErrors] = useState({
     title: '',
     description: '',
@@ -153,6 +153,7 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
         const response = await getMovieList();
         setMoviesList(response.data);
         setEditInfo(response.data);
+        setUpdateON(new Array(response.data.length).fill(false));
       } catch (error) {
         console.error('Error fetching movies:', error);
       }
