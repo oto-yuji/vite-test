@@ -7,14 +7,19 @@ import { getMovieList, createMovie, updateMovie, deleteMovie } from '../api';
 const List = styled.ul`
   list-style-type: none;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center; // カードを中央揃えに
 `;
 
 const MovieCard = styled(animated.li)`
   background-color: #faf0e6; /* linen色 */
   border-radius: 10px;
-  padding: 20px;
+  padding: 15px;
   box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
-  margin: 20px 0;
+  margin: 15px auto;
+  width: 280px; // 幅を指定
+  max-width: 90%; // 最大幅を画面の90%に制限
 `;
 
 const MovieTitle = styled.a`
@@ -59,6 +64,60 @@ const InputField = styled.input`
   color: #444444
 `;
 
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #4b3832;
+`;
+
+const FormContainer = styled.div`
+  position: relative;
+  background-color: #faf0e6;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+`;
+
+const AddButton = styled(Button)`
+  background-color: #4CAF50; // 緑色
+  color: white;
+  font-weight: bold;
+  padding: 8px 16px;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+`;
+
+const CreateButton = styled(Button)`
+  background-color: #FF4500; // オレンジレッド
+  color: white;
+  font-weight: bold;
+  padding: 8px 16px;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+  
+  &:hover {
+    background-color: #FF6347;
+    transform: scale(1.05);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  }
+`;
+
 const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
   const [moviesList, setMoviesList] = useState<Movie[]>(movies);
   const [inputMovie, setInputMovie] = useState({
@@ -68,6 +127,7 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
     emoji: '',
   });
   const [editInfo, setEditInfo] = useState<Movie[]>(movies);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const [updateOn, setUpdateON] = useState<boolean[]>([false]);
 
@@ -140,49 +200,61 @@ const MovieList: React.FC<{ movies: Movie[] }> = ({ movies }) => {
     setUpdateON(newupdateON);
   };
 
+  const toggleCreateForm = () => {
+    setShowCreateForm(!showCreateForm);
+  };
+
   return (
     <>
-      <Button onClick={onCreate}>Create</Button>
-      <div>
-        <InputField
-          type="text"
-          placeholder="Title"
-          value={inputMovie.title}
-          onChange={(e) =>
-            setInputMovie({ ...inputMovie, title: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <InputField
-          type="text"
-          placeholder="Description"
-          value={inputMovie.description}
-          onChange={(e) =>
-            setInputMovie({ ...inputMovie, description: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <InputField
-          type="text"
-          placeholder="URL"
-          value={inputMovie.url}
-          onChange={(e) =>
-            setInputMovie({ ...inputMovie, url: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <InputField
-          type="絵文字"
-          placeholder="絵文字"
-          value={inputMovie.emoji}
-          onChange={(e) =>
-            setInputMovie({ ...inputMovie, emoji: e.target.value })
-          }
-        />
-      </div>
+      {!showCreateForm && (
+        <AddButton onClick={toggleCreateForm}>作品を追加する</AddButton>
+      )}
+      {showCreateForm && (
+        <FormContainer>
+          <CloseButton onClick={toggleCreateForm}>✕</CloseButton>
+          <div>
+            <InputField
+              type="text"
+              placeholder="タイトル"
+              value={inputMovie.title}
+              onChange={(e) =>
+                setInputMovie({ ...inputMovie, title: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <InputField
+              type="text"
+              placeholder="説明"
+              value={inputMovie.description}
+              onChange={(e) =>
+                setInputMovie({ ...inputMovie, description: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <InputField
+              type="text"
+              placeholder="URL"
+              value={inputMovie.url}
+              onChange={(e) =>
+                setInputMovie({ ...inputMovie, url: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <InputField
+              type="text"
+              placeholder="絵文字"
+              value={inputMovie.emoji}
+              onChange={(e) =>
+                setInputMovie({ ...inputMovie, emoji: e.target.value })
+              }
+            />
+          </div>
+          <CreateButton onClick={onCreate}>作品を登録</CreateButton>
+        </FormContainer>
+      )}
       <List>
         {springs.map((springProps, index) => (
           <MovieCard key={index} style={springProps}>
