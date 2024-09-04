@@ -143,6 +143,7 @@ interface RandomRecommendationProps {
   movies?: Movie[]; // オプショナルに変更
 }
 
+
 const RandomRecommendation: React.FC<RandomRecommendationProps> = () => {
   const [randomMovie, setRandomMovie] = useState<Movie | null>(null);
   const [isShuffling, setIsShuffling] = useState(false);
